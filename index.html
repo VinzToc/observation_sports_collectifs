@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observation Sports Collectifs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .header-section {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        select, input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .observation-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .column {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .column-header {
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+            font-size: 0.75em;
+            margin-bottom: 2px;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.7em;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            text-align: center;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .positive { background: #28a745; }
+        .neutral { background: #ffc107; color: #333; }
+        .negative { background: #dc3545; }
+
+        .counter {
+            padding: 6px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1em;
+            color: white;
+            margin-top: 2px;
+        }
+
+        .counter.positive-bg { background: #28a745; }
+        .counter.neutral-bg { background: #ffc107; color: #333; }
+        .counter.negative-bg { background: #dc3545; }
+
+        .stats-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .stats-section h2 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .analysis {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .analysis h3 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .radar-container {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 15px;
+        }
+
+        #radarCanvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.4em;
+            }
+            
+            .column-header {
+                font-size: 0.65em;
+                min-height: 30px;
+            }
+            
+            .action-btn {
+                font-size: 0.6em;
+                padding: 6px;
+            }
+            
+            .counter {
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-btn {
+                font-size: 0.55em;
+                padding: 4px;
+            }
+            
+            .column-header {
+                font-size: 0.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Observation Sports Collectifs</h1>
+        
+        <div class="header-section">
+            <div class="form-group">
+                <label for="sport">Sport :</label>
+                <select id="sport">
+                    <option value="Basketball">Basketball</option>
+                    <option value="Volley-ball">Volley-ball</option>
+                    <option value="Handball">Handball</option>
+                    <option value="Football">Football</option>
+                    <option value="Futsal">Futsal</option>
+                    <option value="Ultimate">Ultimate</option>
+                    <option value="Flag football">Flag football</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="observateur">Nom de l'observateur :</label>
+                <input type="text" id="observateur" placeholder="Entrez votre nom">
+            </div>
+            
+            <div class="form-group">
+                <label for="observe">Nom de l'élève observé :</label>
+                <input type="text" id="observe" placeholder="Entrez le nom de l'élève">
+            </div>
+        </div>
+
+        <div class="observation-grid">
+            <div class="column">
+                <div class="column-header">DÉFENSE</div>
+                <button class="action-btn positive" onclick="increment('def-pos')">Marquer adversaire<br>Récupérer ballon<br>Arrêter progression</button>
+                <button class="action-btn neutral" onclick="increment('def-neu')">Défense tentée<br>mais non efficace</button>
+                <button class="action-btn negative" onclick="increment('def-neg')">Ne défend pas</button>
+                <div class="counter positive-bg" id="def-total">0</div>
+            </div>
+
+            <div class="column">
+                <div class="column-header">ATTAQUE (PORTEUR DE BALLE)</div>
+                <button class="action-btn positive" onclick="increment('att-port-pos')">Progresser vers cible<br>Faire bon choix<br>Conserver ballon</button>
+                <button class="action-btn neutral" onclick="increment('att-port-neu')">Conservation du ballon</button>
+                <button class="action-btn negative" onclick="increment('att-port-neg')">Perte de balle</button>
+                <div class="counter neutral-bg" id="att-port-total">0</div>
+            </div>
+
+            <div class="column">
+                <div class="column-header">ATTAQUE (NON PORTEUR DE BALLE)</div>
+                <button class="action-btn positive" onclick="increment('att-nonport-pos')">Se démarquer<br>à distance de passe<br>Offrir solution</button>
+                <button class="action-btn neutral" onclick="increment('att-nonport-neu')">Essaie de se démarquer</button>
+                <button class="action-btn negative" onclick="increment('att-nonport-neg')">Passif</button>
+                <div class="counter neutral-bg" id="att-nonport-total">0</div>
+            </div>
+
+            <div class="column">
+                <div class="column-header">TIR</div>
+                <button class="action-btn positive" onclick="increment('tir-pos')">Tirs tentés<br>Tirs réussis</button>
+                <button class="action-btn neutral" onclick="increment('tir-neu')">Tir</button>
+                <button class="action-btn negative" onclick="increment('tir-neg')">Tir = Perte de balle</button>
+                <div class="counter negative-bg" id="tir-total">0</div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2>📈 Bilan Statistique</h2>
+            
+            <div class="radar-container">
+                <canvas id="radarCanvas" width="400" height="400"></canvas>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Actions</div>
+                    <div class="stat-value" id="total-actions">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Actions Positives</div>
+                    <div class="stat-value" id="total-positive">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Actions Neutres</div>
+                    <div class="stat-value" id="total-neutral">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Actions Négatives</div>
+                    <div class="stat-value" id="total-negative">0</div>
+                </div>
+            </div>
+
+            <div class="analysis">
+                <h3>🎯 Analyse du Profil de Jeu</h3>
+                <p id="analysis-text">Commencez l'observation pour voir l'analyse...</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+            <button class="reset-btn" onclick="resetAll()">🔄 Réinitialiser l'observation</button>
+            <button class="reset-btn" style="background: #28a745;" onclick="saveToGoogleSheets()">💾 Enregistrer dans Google Sheets</button>
+        </div>
+        
+        <div id="message" style="margin-top: 15px; padding: 15px; border-radius: 10px; text-align: center; display: none;"></div>
+    </div>
+
+    <script>
+        // URL de votre Web App Google Sheets (à remplacer après déploiement)
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzDREzIv_I34URcjnLJ_rAxCzAuby5ckKpqCYn4kxyJrNdBxnp3idnD-kUnWktryFSJ/exec';
+        
+        
+        const counters = {
+            'def-pos': 0, 'def-neu': 0, 'def-neg': 0,
+            'att-port-pos': 0, 'att-port-neu': 0, 'att-port-neg': 0,
+            'att-nonport-pos': 0, 'att-nonport-neu': 0, 'att-nonport-neg': 0,
+            'tir-pos': 0, 'tir-neu': 0, 'tir-neg': 0
+        };
+
+        function increment(action) {
+            counters[action]++;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            // Mise à jour des totaux par colonne
+            document.getElementById('def-total').textContent = 
+                counters['def-pos'] + counters['def-neu'] + counters['def-neg'];
+            document.getElementById('att-port-total').textContent = 
+                counters['att-port-pos'] + counters['att-port-neu'] + counters['att-port-neg'];
+            document.getElementById('att-nonport-total').textContent = 
+                counters['att-nonport-pos'] + counters['att-nonport-neu'] + counters['att-nonport-neg'];
+            document.getElementById('tir-total').textContent = 
+                counters['tir-pos'] + counters['tir-neu'] + counters['tir-neg'];
+
+            // Calcul des statistiques globales
+            const totalPositive = counters['def-pos'] + counters['att-port-pos'] + 
+                                 counters['att-nonport-pos'] + counters['tir-pos'];
+            const totalNeutral = counters['def-neu'] + counters['att-port-neu'] + 
+                                counters['att-nonport-neu'] + counters['tir-neu'];
+            const totalNegative = counters['def-neg'] + counters['att-port-neg'] + 
+                                 counters['att-nonport-neg'] + counters['tir-neg'];
+            const totalActions = totalPositive + totalNeutral + totalNegative;
+
+            document.getElementById('total-actions').textContent = totalActions;
+            document.getElementById('total-positive').textContent = totalPositive;
+            document.getElementById('total-neutral').textContent = totalNeutral;
+            document.getElementById('total-negative').textContent = totalNegative;
+
+            // Mise à jour du graphique radar
+            updateRadarChart();
+
+            // Analyse du profil
+            generateAnalysis(totalActions, totalPositive, totalNeutral, totalNegative);
+        }
+
+        function updateRadarChart() {
+            const canvas = document.getElementById('radarCanvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 60;
+
+            // Calcul des pourcentages pour chaque catégorie
+            const defTotal = counters['def-pos'] + counters['def-neu'] + counters['def-neg'];
+            const attPortTotal = counters['att-port-pos'] + counters['att-port-neu'] + counters['att-port-neg'];
+            const attNonPortTotal = counters['att-nonport-pos'] + counters['att-nonport-neu'] + counters['att-nonport-neg'];
+            const tirTotal = counters['tir-pos'] + counters['tir-neu'] + counters['tir-neg'];
+
+            const defScore = defTotal > 0 ? (counters['def-pos'] / defTotal) * 100 : 0;
+            const attPortScore = attPortTotal > 0 ? (counters['att-port-pos'] / attPortTotal) * 100 : 0;
+            const attNonPortScore = attNonPortTotal > 0 ? (counters['att-nonport-pos'] / attNonPortTotal) * 100 : 0;
+            const tirScore = tirTotal > 0 ? (counters['tir-pos'] / tirTotal) * 100 : 0;
+
+            const data = [
+                { label: 'Défense', value: defScore },
+                { label: 'Progresser\net Conserver', value: attPortScore },
+                { label: 'Marquage et\nDémarquage', value: attNonPortScore },
+                { label: 'Tirs et\nButs', value: tirScore }
+            ];
+
+            // Effacer le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dessiner les cercles de référence
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 5; i++) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, (radius * i) / 5, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+
+            // Dessiner les axes
+            const angleStep = (2 * Math.PI) / data.length;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            
+            data.forEach((item, index) => {
+                const angle = angleStep * index - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                // Labels
+                const labelX = centerX + (radius + 40) * Math.cos(angle);
+                const labelY = centerY + (radius + 40) * Math.sin(angle);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const lines = item.label.split('\n');
+                lines.forEach((line, i) => {
+                    ctx.fillText(line, labelX, labelY + (i - lines.length/2 + 0.5) * 14);
+                });
+            });
+
+            // Dessiner la forme des données
+            ctx.beginPath();
+            data.forEach((item, index) => {
+                const angle = angleStep * index - Math.PI / 2;
+                const distance = (item.value / 100) * radius;
+                const x = centerX + distance * Math.cos(angle);
+                const y = centerY + distance * Math.sin(angle);
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.closePath();
+            
+            // Remplissage
+            ctx.fillStyle = 'rgba(102, 126, 234, 0.4)';
+            ctx.fill();
+            
+            // Contour
+            ctx.strokeStyle = 'rgba(102, 126, 234, 1)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Points
+            data.forEach((item, index) => {
+                const angle = angleStep * index - Math.PI / 2;
+                const distance = (item.value / 100) * radius;
+                const x = centerX + distance * Math.cos(angle);
+                const y = centerY + distance * Math.sin(angle);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fillStyle = 'white';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(102, 126, 234, 1)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Valeurs
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 11px Arial';
+                ctx.fillText(item.value.toFixed(0) + '%', x, y - 12);
+            });
+        }
+
+        function generateAnalysis(total, pos, neu, neg) {
+            if (total === 0) {
+                document.getElementById('analysis-text').textContent = 
+                    "Commencez l'observation pour voir l'analyse...";
+                return;
+            }
+
+            const posPercent = ((pos / total) * 100).toFixed(1);
+            const negPercent = ((neg / total) * 100).toFixed(1);
+
+            let profile = "";
+            let recommendation = "";
+
+            if (posPercent >= 60) {
+                profile = "Joueur très efficace et actif";
+                recommendation = "Continue sur cette lancée ! Cherche à varier encore plus ton jeu.";
+            } else if (posPercent >= 40) {
+                profile = "Joueur efficace avec des marges de progression";
+                recommendation = "Bon niveau de jeu. Concentre-toi sur la réduction des actions négatives.";
+            } else if (negPercent >= 40) {
+                profile = "Joueur en difficulté, besoin d'accompagnement";
+                recommendation = "Travaille sur les fondamentaux et la lecture du jeu.";
+            } else {
+                profile = "Joueur en apprentissage";
+                recommendation = "Continue tes efforts ! Prends confiance progressivement.";
+            }
+
+            // Analyse par domaine
+            const defTotal = counters['def-pos'] + counters['def-neu'] + counters['def-neg'];
+            const attPortTotal = counters['att-port-pos'] + counters['att-port-neu'] + counters['att-port-neg'];
+            const attNonPortTotal = counters['att-nonport-pos'] + counters['att-nonport-neu'] + counters['att-nonport-neg'];
+            const tirTotal = counters['tir-pos'] + counters['tir-neu'] + counters['tir-neg'];
+
+            let strengths = [];
+            if (defTotal > 0 && counters['def-pos'] / defTotal >= 0.5) strengths.push("Défense");
+            if (attPortTotal > 0 && counters['att-port-pos'] / attPortTotal >= 0.5) strengths.push("Jeu avec ballon");
+            if (attNonPortTotal > 0 && counters['att-nonport-pos'] / attNonPortTotal >= 0.5) strengths.push("Démarquage");
+            if (tirTotal > 0 && counters['tir-pos'] / tirTotal >= 0.5) strengths.push("Tir");
+
+            const strengthText = strengths.length > 0 ? 
+                `<br><br><strong>Points forts :</strong> ${strengths.join(", ")}` : "";
+
+            document.getElementById('analysis-text').innerHTML = 
+                `<strong>Profil :</strong> ${profile}<br>` +
+                `<strong>Efficacité :</strong> ${posPercent}% d'actions positives<br>` +
+                `<strong>Recommandation :</strong> ${recommendation}${strengthText}`;
+        }
+
+        function resetAll() {
+            if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les données ?')) {
+                for (let key in counters) {
+                    counters[key] = 0;
+                }
+                updateDisplay();
+            }
+        }
+
+        // Initialiser le graphique au chargement
+        window.onload = function() {
+            updateRadarChart();
+        };
+
+        function saveToGoogleSheets() {
+            const sport = document.getElementById('sport').value;
+            const observateur = document.getElementById('observateur').value;
+            const observe = document.getElementById('observe').value;
+
+            // Validation
+            if (!observateur || !observe) {
+                showMessage('Veuillez renseigner les noms de l\'observateur et de l\'élève observé', 'error');
+                return;
+            }
+
+            const totalActions = parseInt(document.getElementById('total-actions').textContent);
+            if (totalActions === 0) {
+                showMessage('Aucune action enregistrée. Veuillez observer avant d\'enregistrer.', 'error');
+                return;
+            }
+
+            // Génération de l'image du graphique radar en base64
+            const canvas = document.getElementById('radarCanvas');
+            const radarImageBase64 = canvas.toDataURL('image/png');
+
+            // Préparation des données
+            const data = {
+                date: new Date().toLocaleString('fr-FR'),
+                sport: sport,
+                observateur: observateur,
+                observe: observe,
+                // Défense
+                defPos: counters['def-pos'],
+                defNeu: counters['def-neu'],
+                defNeg: counters['def-neg'],
+                defTotal: counters['def-pos'] + counters['def-neu'] + counters['def-neg'],
+                // Attaque porteur
+                attPortPos: counters['att-port-pos'],
+                attPortNeu: counters['att-port-neu'],
+                attPortNeg: counters['att-port-neg'],
+                attPortTotal: counters['att-port-pos'] + counters['att-port-neu'] + counters['att-port-neg'],
+                // Attaque non porteur
+                attNonPortPos: counters['att-nonport-pos'],
+                attNonPortNeu: counters['att-nonport-neu'],
+                attNonPortNeg: counters['att-nonport-neg'],
+                attNonPortTotal: counters['att-nonport-pos'] + counters['att-nonport-neu'] + counters['att-nonport-neg'],
+                // Tir
+                tirPos: counters['tir-pos'],
+                tirNeu: counters['tir-neu'],
+                tirNeg: counters['tir-neg'],
+                tirTotal: counters['tir-pos'] + counters['tir-neu'] + counters['tir-neg'],
+                // Totaux globaux
+                totalActions: totalActions,
+                totalPositive: parseInt(document.getElementById('total-positive').textContent),
+                totalNeutral: parseInt(document.getElementById('total-neutral').textContent),
+                totalNegative: parseInt(document.getElementById('total-negative').textContent),
+                // Pourcentages
+                pourcentagePositif: ((parseInt(document.getElementById('total-positive').textContent) / totalActions) * 100).toFixed(1),
+                // Image du graphique radar
+                radarImage: radarImageBase64
+            };
+
+            // Envoi vers Google Sheets
+            showMessage('Enregistrement en cours...', 'info');
+            
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                showMessage('✅ Données enregistrées avec succès dans Google Sheets !', 'success');
+            })
+            .catch((error) => {
+                showMessage('❌ Erreur lors de l\'enregistrement. Vérifiez votre connexion.', 'error');
+                console.error('Erreur:', error);
+            });
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                messageDiv.style.background = '#28a745';
+                messageDiv.style.color = 'white';
+            } else if (type === 'error') {
+                messageDiv.style.background = '#dc3545';
+                messageDiv.style.color = 'white';
+            } else {
+                messageDiv.style.background = '#ffc107';
+                messageDiv.style.color = '#333';
+            }
+
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
